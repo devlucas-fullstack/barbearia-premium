@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { UserAppointmentItem } from "../components/UserAppointmentItem";
+import { Link } from "react-router-dom";
 
 const appointment = {
   id: "11",
@@ -40,10 +41,13 @@ export function UserDashboard() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl text-slate-900">Meus Agendamentos</h2>
-          <button className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer">
+          <Link
+            to="/create"
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
+          >
             <Plus className="h-4 w-4" />
             Novo Agendamento
-          </button>
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <UserAppointmentItem data={appointment} />
