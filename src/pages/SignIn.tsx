@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { z, ZodError } from "zod";
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { api } from "../services/api";
+import { useAuth } from "../hooks/auth";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Email inválido!" }),
@@ -18,7 +20,9 @@ export function SignIn() {
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
 
-  function onSubmit(e: React.FormEvent) {
+  const { save } = useAuth();
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     try {
@@ -27,7 +31,8 @@ export function SignIn() {
         password,
       });
 
-      console.log(data);
+      const response = await api.post("/sessions", data);
+      save(response.data);
     } catch (error) {
       if (error instanceof ZodError) {
         const { fieldErrors } = error.flatten();
