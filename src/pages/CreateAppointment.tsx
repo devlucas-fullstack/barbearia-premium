@@ -32,7 +32,8 @@ export function CreateAppointment() {
         barberId,
       });
 
-      console.log(data);
+      await api.post("/appointments", data);
+      navigate("/");
     } catch (error) {
       if (error instanceof ZodError) {
         const { fieldErrors } = error.flatten();
@@ -135,14 +136,13 @@ export function CreateAppointment() {
           <div className="flex gap-3 mt-2">
             <Button
               className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              /*onClick={() => navigate("/")}*/
+              onClick={() => navigate("/")}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
-              /*onClick={() => navigate("/")}*/
             >
               Agendar
             </Button>
