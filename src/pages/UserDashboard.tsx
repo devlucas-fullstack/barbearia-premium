@@ -1,16 +1,37 @@
 import { Plus } from "lucide-react";
 import { UserAppointmentItem } from "../components/UserAppointmentItem";
 import { Link } from "react-router-dom";
-
-const appointment = {
-  id: "11",
-  category: "Corte + Barba",
-  barber: "Carlos",
-  date: "27/01/2026|18:00",
-  status: "Confirmado",
-};
+import type { AppointmentItemProps } from "../components/UserAppointmentItem";
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { AxiosError } from "axios";
+import { useAuth } from "../hooks/auth";
 
 export function UserDashboard() {
+  const { session } = useAuth();
+  const [appointments, setAppointments] = useState<AppointmentItemProps[]>([]);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+  async function fetchAppointments() {
+    try {
+      const response = await api.get("/appointments");
+      setAppointments(response.data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setErrors({
+          api: [error.response?.data.message || "Erro no servidor!"],
+        });
+        return;
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!session) return;
+
+    fetchAppointments();
+  }, [session]);
+
   return (
     <main className="max-w-6xl mx-auto py-8 px-4">
       <section className="mb-8">
@@ -49,9 +70,17 @@ export function UserDashboard() {
             Novo Agendamento
           </Link>
         </div>
+
+        {errors.api && (
+          <div className="text-sm font-semibold text-red-500">
+            {errors.api[0]}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UserAppointmentItem data={appointment} />
-          <UserAppointmentItem data={appointment} />
+          {appointments.map((appointment) => (
+            <UserAppointmentItem key={appointment.id} data={appointment} />
+          ))}
         </div>
       </section>
     </main>
