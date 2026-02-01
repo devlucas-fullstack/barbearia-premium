@@ -14,9 +14,10 @@ export type AppointmentItemProps = {
 
 type Props = React.ComponentProps<"div"> & {
   data: AppointmentItemProps;
+  onCancel: (id: string) => void;
 };
 
-export function UserAppointmentItem({ data, ...rest }: Props) {
+export function UserAppointmentItem({ data, onCancel, ...rest }: Props) {
   const date = new Date(data.data);
 
   const dataFormat = format(date, "dd/MM/yyyy", { locale: ptBR });
@@ -47,7 +48,10 @@ export function UserAppointmentItem({ data, ...rest }: Props) {
           {horaFormat}
         </div>
       </div>
-      <button className="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg trasition-colors text-sm cursor-pointer">
+      <button
+        className="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg trasition-colors text-sm cursor-pointer"
+        onClick={() => onCancel(data.id)}
+      >
         Cancelar Agendamento
       </button>
     </div>

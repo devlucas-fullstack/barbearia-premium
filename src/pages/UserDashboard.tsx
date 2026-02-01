@@ -26,6 +26,19 @@ export function UserDashboard() {
     }
   }
 
+  async function handleCancelAppointment(id: string) {
+    try {
+      await api.patch(`/appointments/${id}/canceled`);
+
+      setAppointments((prev) =>
+        prev.filter((appointment) => appointment.id !== id),
+      );
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao cancelar agendamento!");
+    }
+  }
+
   useEffect(() => {
     if (!session) return;
 
@@ -79,7 +92,11 @@ export function UserDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {appointments.map((appointment) => (
-            <UserAppointmentItem key={appointment.id} data={appointment} />
+            <UserAppointmentItem
+              key={appointment.id}
+              data={appointment}
+              onCancel={handleCancelAppointment}
+            />
           ))}
         </div>
       </section>
