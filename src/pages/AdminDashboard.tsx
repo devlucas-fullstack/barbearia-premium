@@ -1,16 +1,27 @@
 import { Calendar, Clock, CircleCheckBig, CircleX, Funnel } from "lucide-react";
 import { AdminAppointmentItem } from "../components/AdminAppointmentItem";
-
-const appointment = {
-  id: "11",
-  category: "Corte",
-  client: "Lucas",
-  barber: "João",
-  date: "27/01/2026|19:00",
-  status: "Pendente",
-};
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { useAuth } from "../hooks/auth";
+import type { AppointmentItemProps } from "../components/UserAppointmentItem";
 
 export function AdminDashboard() {
+  const { session } = useAuth();
+  const [appointments, setAppointments] = useState<AppointmentItemProps[]>([]);
+
+  async function fetchAppointments() {
+    try {
+      const response = await api.get("/appointments");
+      setAppointments(response.data);
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    if (!session) return;
+
+    fetchAppointments();
+  }, [session]);
+
   return (
     <main className="max-w-6xl mx-auto py-8 px-4">
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -76,7 +87,40 @@ export function AdminDashboard() {
           </div>
         </div>
       </section>
-      <AdminAppointmentItem data={appointment} />
+      <section className="bg-white overflow-hidden rounded-lg border border-slate-200">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Cliente
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Serviço
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Barbeiro
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Data
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Horário
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                Ações
+              </th>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {appointments.map((appointment) => (
+                <AdminAppointmentItem data={appointment} key={appointment.id} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }
