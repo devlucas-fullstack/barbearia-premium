@@ -16,10 +16,17 @@ export function AdminDashboard() {
     canceled: 0,
   });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [date, setDate] = useState("");
+  const [status, setStatus] = useState("");
 
   async function fetchAppointments() {
     try {
-      const response = await api.get("/appointments");
+      const params = new URLSearchParams();
+
+      if (date) params.append("date", date);
+      if (status) params.append("status", status);
+
+      const response = await api.get(`/appointments?${params.toString()}`);
       setAppointments(response.data);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -68,7 +75,7 @@ export function AdminDashboard() {
 
     fetchAppointments();
     countDashboard();
-  }, [session]);
+  }, [session, date, status]);
 
   return (
     <main className="max-w-6xl mx-auto py-8 px-4">
@@ -117,8 +124,9 @@ export function AdminDashboard() {
             <div>
               <label className="text-sm text-slate-600 mr-2">Status:</label>
               <select
-                defaultValue=""
                 className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
               >
                 <option value="">Todos</option>
                 <option value="PENDING">Pendente</option>
@@ -127,9 +135,11 @@ export function AdminDashboard() {
               </select>
             </div>
             <div>
-              <label className="text-sm text-slate-600 mr-2">Status:</label>
+              <label className="text-sm text-slate-600 mr-2">Data:</label>
               <input
                 type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
                 className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
               />
             </div>
