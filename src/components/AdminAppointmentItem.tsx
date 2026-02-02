@@ -5,12 +5,13 @@ import { ptBR } from "date-fns/locale";
 
 type Props = React.ComponentProps<"tr"> & {
   data: AppointmentItemProps;
+  onCancel: (id: string) => void;
 };
 
-export function AdminAppointmentItem({ data, ...rest }: Props) {
+export function AdminAppointmentItem({ data, onCancel, ...rest }: Props) {
   const date = new Date(data.data);
   const dataFormat = format(date, "dd/MM/yyyy", { locale: ptBR });
-  const horaFormat = format(date, "HH/mm", { locale: ptBR });
+  const horaFormat = format(date, "HH:mm", { locale: ptBR });
 
   return (
     <tr className="hover:bg-slate-50" {...rest}>
@@ -27,20 +28,25 @@ export function AdminAppointmentItem({ data, ...rest }: Props) {
         </span>
       </td>
       <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <button
-            className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
-            title="Confirmar"
-          >
-            <CircleCheckBig className="w-5 h-5 cursor-pointer" />
-          </button>
-          <button
-            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Cancelar"
-          >
-            <CircleX className="w-5 h-5 cursor-pointer" />
-          </button>
-        </div>
+        {data.status === "Cancelado" ? (
+          <span className="text-xs text-slate-400">Sem ações</span>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
+              title="Confirmar"
+            >
+              <CircleCheckBig className="w-5 h-5 cursor-pointer" />
+            </button>
+            <button
+              className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+              title="Cancelar"
+              onClick={() => onCancel(data.id)}
+            >
+              <CircleX className="w-5 h-5 cursor-pointer" />
+            </button>
+          </div>
+        )}
       </td>
     </tr>
   );

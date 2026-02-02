@@ -4,16 +4,35 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/auth";
 import type { AppointmentItemProps } from "../components/UserAppointmentItem";
+import { AxiosError } from "axios";
 
 export function AdminDashboard() {
   const { session } = useAuth();
   const [appointments, setAppointments] = useState<AppointmentItemProps[]>([]);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   async function fetchAppointments() {
     try {
       const response = await api.get("/appointments");
       setAppointments(response.data);
-    } catch (error) {}
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setErrors({
+          api: [error.response?.data.message || "Erro no servidor!"],
+        });
+        return;
+      }
+    }
+  }
+
+  async function handleCancelAppointment(id: string) {
+    try {
+      await api.patch(`/appointments/${id}/canceled`);
+      await fetchAppointments();
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao cancelar agendamento!");
+    }
   }
 
   useEffect(() => {
@@ -68,10 +87,11 @@ export function AdminDashboard() {
           <div className="flex items-center gap-4 flex-1">
             <div>
               <label className="text-sm text-slate-600 mr-2">Status:</label>
-              <select className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
-                <option value="" selected>
-                  Todos
-                </option>
+              <select
+                defaultValue=""
+                className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
+              >
+                <option value="">Todos</option>
                 <option value="PENDING">Pendente</option>
                 <option value="CONFIRMED">Confirmado</option>
                 <option value="CANCELED">Cancelado</option>
@@ -87,35 +107,48 @@ export function AdminDashboard() {
           </div>
         </div>
       </section>
+
+      {errors.api && (
+        <div className="text-sm text-red-500 font-semibold">
+          {errors.api[0]}
+        </div>
+      )}
+
       <section className="bg-white overflow-hidden rounded-lg border border-slate-200">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Cliente
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Serviço
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Barbeiro
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Data
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Horário
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
-                Ações
-              </th>
+              <tr>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Cliente
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Serviço
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Barbeiro
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Data
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Horário
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 uppercase text-left text-xs text-slate-500 tracking-wider">
+                  Ações
+                </th>
+              </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
               {appointments.map((appointment) => (
-                <AdminAppointmentItem data={appointment} key={appointment.id} />
+                <AdminAppointmentItem
+                  data={appointment}
+                  key={appointment.id}
+                  onCancel={handleCancelAppointment}
+                />
               ))}
             </tbody>
           </table>
