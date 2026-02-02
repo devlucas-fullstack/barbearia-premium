@@ -9,6 +9,12 @@ import { AxiosError } from "axios";
 export function AdminDashboard() {
   const { session } = useAuth();
   const [appointments, setAppointments] = useState<AppointmentItemProps[]>([]);
+  const [count, setCount] = useState({
+    total: 0,
+    confirmed: 0,
+    pending: 0,
+    canceled: 0,
+  });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   async function fetchAppointments() {
@@ -29,9 +35,20 @@ export function AdminDashboard() {
     try {
       await api.patch(`/appointments/${id}/canceled`);
       await fetchAppointments();
+      await countDashboard();
     } catch (error) {
       console.error(error);
       alert("Erro ao cancelar agendamento!");
+    }
+  }
+
+  async function countDashboard() {
+    try {
+      const response = await api.get(`/appointments/dashboard`);
+      setCount(response.data);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao carregar dashboard!");
     }
   }
 
@@ -39,6 +56,7 @@ export function AdminDashboard() {
     if (!session) return;
 
     fetchAppointments();
+    countDashboard();
   }, [session]);
 
   return (
@@ -48,7 +66,7 @@ export function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 mb-1">Total</p>
-              <p className="text-2xl text-slate-900">2</p>
+              <p className="text-2xl text-slate-900">{count.total}</p>
             </div>
             <Calendar className="w-8 h-8 text-slate-400" />
           </div>
@@ -57,7 +75,7 @@ export function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 mb-1">Pedentes</p>
-              <p className="text-2xl text-yellow-600">2</p>
+              <p className="text-2xl text-yellow-600">{count.pending}</p>
             </div>
             <Clock className="w-8 h-8 text-yellow-400" />
           </div>
@@ -66,7 +84,7 @@ export function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 mb-1">Confirmados</p>
-              <p className="text-2xl text-green-600">2</p>
+              <p className="text-2xl text-green-600">{count.confirmed}</p>
             </div>
             <CircleCheckBig className="w-8 h-8 text-green-400" />
           </div>
@@ -75,7 +93,7 @@ export function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 mb-1">Cancelados</p>
-              <p className="text-2xl text-red-600">2</p>
+              <p className="text-2xl text-red-600">{count.canceled}</p>
             </div>
             <CircleX className="w-8 h-8 text-red-400" />
           </div>
