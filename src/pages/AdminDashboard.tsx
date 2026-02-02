@@ -42,6 +42,17 @@ export function AdminDashboard() {
     }
   }
 
+  async function handleConfirmAppointment(id: string) {
+    try {
+      await api.patch(`/appointments/${id}/confirm`);
+      await fetchAppointments();
+      await countDashboard();
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao confirmar agendamento!");
+    }
+  }
+
   async function countDashboard() {
     try {
       const response = await api.get(`/appointments/dashboard`);
@@ -166,6 +177,7 @@ export function AdminDashboard() {
                   data={appointment}
                   key={appointment.id}
                   onCancel={handleCancelAppointment}
+                  onConfirm={handleConfirmAppointment}
                 />
               ))}
             </tbody>

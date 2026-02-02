@@ -6,9 +6,15 @@ import { ptBR } from "date-fns/locale";
 type Props = React.ComponentProps<"tr"> & {
   data: AppointmentItemProps;
   onCancel: (id: string) => void;
+  onConfirm: (id: string) => void;
 };
 
-export function AdminAppointmentItem({ data, onCancel, ...rest }: Props) {
+export function AdminAppointmentItem({
+  data,
+  onCancel,
+  onConfirm,
+  ...rest
+}: Props) {
   const date = new Date(data.data);
   const dataFormat = format(date, "dd/MM/yyyy", { locale: ptBR });
   const horaFormat = format(date, "HH:mm", { locale: ptBR });
@@ -28,13 +34,12 @@ export function AdminAppointmentItem({ data, onCancel, ...rest }: Props) {
         </span>
       </td>
       <td className="px-6 py-4">
-        {data.status === "Cancelado" ? (
-          <span className="text-xs text-slate-400">Sem ações</span>
-        ) : (
+        {data.status === "Pendente" && (
           <div className="flex items-center gap-2">
             <button
               className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
               title="Confirmar"
+              onClick={() => onConfirm(data.id)}
             >
               <CircleCheckBig className="w-5 h-5 cursor-pointer" />
             </button>
@@ -46,6 +51,19 @@ export function AdminAppointmentItem({ data, onCancel, ...rest }: Props) {
               <CircleX className="w-5 h-5 cursor-pointer" />
             </button>
           </div>
+        )}
+
+        {data.status === "Confirmado" && (
+          <button
+            className="px-3 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded transition-colors"
+            onClick={() => onCancel(data.id)}
+          >
+            Cancelar
+          </button>
+        )}
+
+        {data.status === "Cancelado" && (
+          <span className="text-xs text-slate-400">Sem ações</span>
         )}
       </td>
     </tr>
