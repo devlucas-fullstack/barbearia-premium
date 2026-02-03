@@ -83,9 +83,9 @@ export function CreateAppointment() {
             value={barberId}
             onChange={(e) => setBarberId(e.target.value)}
           >
-            <option value="3907e909-16bc-4630-b3da-efdbfe18b9f0">João</option>
-            <option value="732206db-d92a-4cd1-a9df-98a68f7b1711">Marcos</option>
-            <option value="e106dcae-bcb5-42c7-8d81-01664bc590d5">Carlos</option>
+            <option value="d665e55f-5c4d-48c5-971c-99b9c6e1c80f">João</option>
+            <option value="d7f94810-59d2-4210-ab88-5c03dd6e3c87">Marcos</option>
+            <option value="25c54c32-7a07-48f2-89b3-68b0278ed168">Carlos</option>
           </Select>
 
           {formErrors.barberId && (
